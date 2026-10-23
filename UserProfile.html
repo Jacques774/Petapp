@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Profile</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #EAF3FF;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ⭐ USER PROFILE HEADER */
+.welcome-bar {
+    background: #4A90E2;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    box-sizing: border-box;
+
+    height: 100px;      /* ⭐ MATCHES DASHBOARD */
+    padding: 0 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.header-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.edit-icon {
+    background: white;
+    color: #4A90E2;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ⭐ BOTTOM BAR — EXACT MATCH TO DASHBOARD */
+.bottom-nav {
+    background: #4A90E2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    font-size: 22px;
+    color: white;
+    padding: 0;
+}
+
+/* ⭐ NAV ITEM — identical to Dashboard */
+.nav-item {
+    text-align: center;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 60px;
+    position: relative;
+}
+
+/* ⭐ PAGE CONTENT */
+.container {
+    width: 92%;
+    margin: auto;
+    padding-bottom: 100px;
+    height: calc(100% - 128px);
+    overflow-y: auto;
+}
+
+/* PET GRID */
+.pet-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+/* PET CARD */
+.pet-card {
+    background: #FFFFFF;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.pet-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 110px;
+}
+
+.pet-photo-small {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+}
+
+.pet-name {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2C3E50;
+    text-align: center;
+}
+
+.pet-right {
+    flex: 1;
+}
+
+.pet-task-item {
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #1A4C7C;
+}
+
+.time-btn {
+    background: #4A90E2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 6px;
+    margin-top: 6px;
+}
+
+.time-btn.completed {
+    background: #7BC47F;
+}
+</style>
+
+</head>
+<body>
+
+<div class="welcome-bar">
+    <div class="header-left">
+        <img id="headerPhoto" class="header-photo">
+        <div id="headerName" class="header-name"></div>
+    </div>
+
+    <div id="editIcon" class="edit-icon">⋮</div>
+</div>
+
+<div class="container">
+    <div class="pet-grid" id="petTaskGrid"></div>
+</div>
+
+<!-- ⭐ FINAL FIX: bottom-nav now matches Dashboard EXACTLY -->
+<div class="bottom-nav">
+
+    <div class="nav-item" onclick="location.href='Dashboard.html'">
+        <span>🏠</span>
+    </div>
+
+    <div class="nav-item" id="teamIcon" onclick="location.href='TeamProfile.html'">
+        <span>👥</span>
+        <div class="notify-dot"></div>
+    </div>
+
+    <div class="nav-item">
+        <span>🧑</span>
+    </div>
+
+</div>
+                    
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const params = new URLSearchParams(window.location.search);
+    const userId = Number(params.get("id"));
+
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+    let care = JSON.parse(localStorage.getItem("care") || "[]");
+    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
+
+    const user = users.find(u => Number(u.id) === Number(userId));
+
+    if (!user) {
+        alert("User not found");
+        window.location.href = "Dashboard.html";
+    }
+
+    /* HEADER */
+    document.getElementById("headerPhoto").src = user.photo;
+    document.getElementById("headerName").textContent = user.name;
+
+    document.getElementById("editIcon").onclick = () => {
+        window.location.href = `ManageUser.html?id=${user.id}`;
+    };
+
+    /* ⭐ Helper: today's date key */
+    function todayKey() {
+        return new Date().toISOString().split("T")[0];
+    }
+
+    /* ⭐ Check if a time slot is completed today */
+    function isCompletedToday(petId, careId, timeSlot) {
+        return petLogs.some(log =>
+            log.petId === petId &&
+            log.careId === careId &&
+            log.timeSlot === timeSlot &&
+            log.date === todayKey()
+        );
+    }
+
+    /* ⭐ Add pet log */
+    function addPetLog(petId, careId, timeSlot, text, userId) {
+        const now = new Date();
+        const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+        const userObj = users.find(u => u.id === userId);
+
+        petLogs.push({
+            id: Date.now(),
+            petId,
+            careId,
+            userId,
+            userName: userObj ? userObj.name : "Unknown",
+            timeSlot,
+            date: todayKey(),
+            text,
+            time
+        });
+
+        localStorage.setItem("petLogs", JSON.stringify(petLogs));
+    }
+
+    /* ⭐ Render pet task cards */
+    function renderPetTasks() {
+        const grid = document.getElementById("petTaskGrid");
+        grid.innerHTML = "";
+
+        const userTasks = assigned.filter(a => Number(a.userId) === Number(userId));
+
+        if (userTasks.length === 0) {
+            grid.innerHTML = "<p style='text-align:center;color:#555;margin-top:20px;'>No tasks assigned.</p>";
+            return;
+        }
+
+        const grouped = {};
+        userTasks.forEach(t => {
+            if (!grouped[t.petId]) grouped[t.petId] = [];
+            grouped[t.petId].push(t);
+        });
+
+        Object.keys(grouped).forEach(petId => {
+            const pet = pets.find(p => Number(p.id) === Number(petId));
+            if (!pet) return;
+
+            const tasks = grouped[petId];
+
+            const card = document.createElement("div");
+            card.className = "pet-card";
+
+            let html = `
+                <div class="pet-left">
+                    <img src="${pet.photo}" class="pet-photo-small">
+                    <div class="pet-name">${pet.name}</div>
+                </div>
+
+                <div class="pet-right">
+            `;
+
+            tasks.forEach(t => {
+                const careItem = care.find(c => Number(c.id) === Number(t.careId));
+                if (!careItem) return;
+
+                html += `
+                    <div class="pet-task-item">
+                        <strong>${careItem.name}</strong> (${careItem.times}×)<br>
+                        ${careItem.schedule.map(time => `
+                            <button class="time-btn"
+                                data-pet="${pet.id}"
+                                data-care="${careItem.id}"
+                                data-time="${time}">
+                                ${time}
+                            </button>
+                        `).join("")}
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            card.innerHTML = html;
+            grid.appendChild(card);
+        });
+
+        /* ⭐ Apply completed state + toggle behavior */
+        document.querySelectorAll(".time-btn").forEach(btn => {
+            const petId = Number(btn.dataset.pet);
+            const careId = Number(btn.dataset.care);
+            const timeSlot = btn.dataset.time;
+
+            const careItem = care.find(c => c.id === careId);
+
+            /* ⭐ Auto-complete if logged today */
+            if (isCompletedToday(petId, careId, timeSlot)) {
+                btn.classList.add("completed");
+            } else {
+                btn.classList.remove("completed");
+            }
+
+            btn.onclick = () => {
+
+                /* ⭐ If already completed → unselect manually */
+                if (btn.classList.contains("completed")) {
+                    btn.classList.remove("completed");
+
+                    // Remove today's log
+                    petLogs = petLogs.filter(log =>
+                        !(log.petId === petId &&
+                          log.careId === careId &&
+                          log.timeSlot === timeSlot &&
+                          log.date === todayKey())
+                    );
+
+                    localStorage.setItem("petLogs", JSON.stringify(petLogs));
+                    return;
+                }
+
+                /* ⭐ Mark completed */
+                btn.classList.add("completed");
+
+                const action = `${careItem.name} at ${timeSlot}`;
+
+                /* ⭐ Save today's log */
+                addPetLog(petId, careId, timeSlot, action, user.id);
+            };
+        });
+    }
+
+    /* ⭐ Render tasks THEN apply daily reset */
+    renderPetTasks();
+   
+
+});
+</script>
+
+</body>
+</html>
