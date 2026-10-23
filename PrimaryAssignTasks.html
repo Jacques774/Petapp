@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assign Care Tasks</title>
+
+<style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #EAF3FF;
+    }
+
+    .welcome-bar {
+        background: #4A90E2;
+        padding: 12px 18px;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .container {
+        width: 92%;
+        margin: 20px auto 0 auto;
+        padding: 20px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        height: calc(100% - 140px);
+        overflow-y: auto;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2C3E50;
+    }
+
+    .pet-section {
+        background: #FFFFFF;
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid #D7E4F7;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .pet-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .pet-photo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #4A90E2;
+    }
+
+    .pet-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2C3E50;
+    }
+
+    .task-row {
+        background: #FFFFFF;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #D7E4F7;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .task-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 70%;
+    }
+
+    .task-title {
+        font-size: 17px;
+        font-weight: bold;
+        color: #2C3E50;
+    }
+
+    .task-meta {
+        font-size: 14px;
+        color: #4A90E2;
+    }
+
+    .task-time {
+        font-size: 14px;
+        color: #2C3E50;
+        opacity: 0.85;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .assign-btn {
+        background: #4A90E2;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .assign-btn:hover {
+        background: #357ABD;
+    }
+
+    .assigned-badge {
+        background: #999;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        opacity: 0.7;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #4A90E2;
+        padding: 12px 18px;
+        display: flex;
+        justify-content: space-around;
+        font-size: 20px;
+        color: white;
+        font-weight: bold;
+        box-sizing: border-box;
+    }
+
+    .nav-item {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    /* ⭐ Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 15px;
+        opacity: 0;
+        transition: opacity 0.4s ease, bottom 0.4s ease;
+        z-index: 9999;
+    }
+    .toast.show {
+        opacity: 1;
+        bottom: 40px;
+    }
+</style>
+</head>
+<body>
+
+<div class="welcome-bar">
+    🐾 Assign Care Tasks
+</div>
+
+<div class="container">
+    <h2 id="assignTitle">Assigning Tasks</h2>
+    <div id="assignContainer"></div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='Dashboard.html'">🏠</div>
+    <div class="nav-item" onclick="location.href='TeamProfile.html'">👥</div>
+    
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const userId = Number(params.get("user"));
+
+const users = JSON.parse(localStorage.getItem("users") || "[]");
+const pets = JSON.parse(localStorage.getItem("pets") || "[]");
+const care = JSON.parse(localStorage.getItem("care") || "[]");
+let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+
+const user = users.find(u => Number(u.id) === userId);
+
+if (!user) {
+    showToast("User not found");
+    window.location.href = "TeamProfile.html";
+}
+
+document.getElementById("assignTitle").innerText = `Assigning Tasks to ${user.name}`;
+
+function renderAssignScreen() {
+    const container = document.getElementById("assignContainer");
+    container.innerHTML = "";
+
+    pets.forEach(pet => {
+        const petCare = care.filter(c => Number(c.petId) === Number(pet.id));
+        if (petCare.length === 0) return;
+
+        const petDiv = document.createElement("div");
+        petDiv.className = "pet-section";
+
+        petDiv.innerHTML = `
+            <div class="pet-header">
+                <img src="${pet.photo}" class="pet-photo">
+                <div class="pet-name">${pet.name}</div>
+            </div>
+        `;
+
+        petCare.forEach(item => {
+
+            const assignment = assigned.find(a => a.careId === item.id);
+            const isAssigned = Boolean(assignment);
+
+            let assignedName = "";
+            if (isAssigned) {
+                const assignedUser = users.find(u => u.id === assignment.userId);
+                assignedName = assignedUser ? assignedUser.name : "Unknown";
+            }
+
+            let timesHTML = "";
+            item.schedule.forEach(t => {
+                timesHTML += `<div class="task-time">⏰ ${t}</div>`;
+            });
+
+            const row = document.createElement("div");
+            row.className = "task-row";
+
+            row.innerHTML = `
+                <div class="task-info">
+                    <div class="task-title">${item.name}</div>
+                    <div class="task-meta">${item.times}× • Daily</div>
+                    ${timesHTML}
+                </div>
+
+                ${
+                    isAssigned
+                    ? `<div class="assigned-badge">Assigned to ${assignedName}</div>`
+                    : `<button class="assign-btn">Assign</button>`
+                }
+            `;
+
+            if (!isAssigned) {
+                row.querySelector(".assign-btn").onclick = () => {
+
+                    assigned.push({
+                        id: Date.now(),
+                        userId,
+                        petId: pet.id,
+                        careId: item.id,
+                        name: item.name,
+                        times: item.times,
+                        schedule: item.schedule
+                    });
+
+                    localStorage.setItem("assigned", JSON.stringify(assigned));
+
+                    showToast(`Assigned ${item.name} (${pet.name}) to ${user.name}`);
+
+                    renderAssignScreen();
+                };
+            }
+
+            petDiv.appendChild(row);
+        });
+
+        container.appendChild(petDiv);
+    });
+}
+
+renderAssignScreen();
+
+/* ⭐ Toast Notification */
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+    }, 2500);
+}
+</script>
+
+</body>
+</html>
