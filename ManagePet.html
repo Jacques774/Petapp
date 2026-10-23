@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Pet</title>
+
+    <!-- ===========================
+         UPDATED CSS
+    ============================ -->
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #EAF3FF;
+        }
+
+        .welcome-bar {
+            background: #4A90E2;
+            padding: 14px 18px;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .delete-icon-header {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #FFB3B3;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #8B0000;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            cursor: pointer;
+        }
+
+        .container {
+            width: 92%;
+            margin: 20px auto 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            height: calc(100% - 160px);
+            overflow-y: auto;
+        }
+
+        .profile-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .photo-wrapper-small {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .small-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4A90E2;
+        }
+
+        .change-photo-btn-small {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background: #4A90E2;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .name-species-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .name-input-inline,
+        .species-input-inline {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #AFC7E8;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .action-btn:hover {
+            background: #357ABD;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #2C3E50;
+            margin: 18px 0 8px 0;
+            font-weight: bold;
+        }
+
+        .task-row {
+            background: #FFFFFF;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid #D7E4F7;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2C3E50;
+        }
+
+        .task-meta {
+            font-size: 14px;
+            color: #4A90E2;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 28px 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .picker-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .picker-card {
+            background: #ffffff;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 20px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+            transition: 0.2s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .picker-card:hover {
+            background: #f7f7f7;
+        }
+
+        .picker-card.selected {
+            border-color: #4A90E2;
+            background: #e6f1ff;
+        }
+
+        #customInput {
+            margin-top: 20px;
+            display: none;
+        }
+
+        #timesSelect {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .time-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .time-edit-btn {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        #careTimesContainer {
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+
+        #saveCareItemBtn {
+            display: none;
+            margin-top: 12px;
+        }
+
+        #timePopupBg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.45);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .time-popup {
+            background: white;
+            width: 80%;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .time-popup-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .time-popup-row select {
+            padding: 12px;
+            font-size: 20px;
+            border-radius: 12px;
+            border: 1px solid #AFC7E8;
+            width: 80px;
+            text-align: center;
+        }
+
+        .popup-btn-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .popup-btn-row button {
+            flex: 1;
+        }
+
+        .bottom-nav {
+            background: #4A90E2;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 60px;
+            position: relative;
+        }
+
+        .notify-dot {
+            width: 12px;
+            height: 12px;
+            background: red;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="welcome-bar">
+        Manage <span id="headerName"></span> Profile
+        <div id="deleteIcon" class="delete-icon-header">🗑️</div>
+    </div>
+
+    <div class="container">
+
+        <!-- PROFILE -->
+        <div class="profile-row">
+            <div class="photo-wrapper-small">
+                <img id="smallPhoto" class="small-photo">
+                <div id="changePhotoBtn" class="change-photo-btn-small">📸</div>
+                <input type="file" id="photoFile" accept="image/*" style="display:none;">
+            </div>
+
+            <div class="name-species-wrapper">
+                <input id="nameInput" class="name-input-inline" placeholder="Pet name">
+
+                <!-- ⭐ Species Dropdown -->
+                <select class="species-input-inline" id="speciesSelect" onchange="toggleCustomSpecies()">
+                    <option value="Dog">Dog</option>
+                    <option value="Cat">Cat</option>
+                    <option value="Rabbit">Rabbit</option>
+                    <option value="Bird">Bird</option>
+                    <option value="Fish">Fish</option>
+                    <option value="Custom">Custom...</option>
+                </select>
+
+                <!-- ⭐ Custom Species -->
+                <input 
+                    class="species-input-inline"
+                    id="speciesCustomInput"
+                    placeholder="Enter species"
+                    style="display:none;"
+                >
+            </div>
+        </div>
+
+        <!-- SAVE PET -->
+        <button id="saveBtn" class="action-btn">Save Changes</button>
+
+        <!-- CARE BUTTONS -->
+        <button id="editCareBtn" class="action-btn">Remove Care Items</button>
+        <button id="addCareBtn" class="action-btn">Add Care Item</button>
+
+        <!-- REMOVE CARE SECTION -->
+        <div id="removeCareSection" style="display:none;">
+            <div class="section-title">Remove Care Items</div>
+            <div id="removeCareList"></div>
+        </div>
+
+        <!-- ACTIVE CARE ITEMS -->
+        <div id="activeCareSection">
+            <div class="section-title">Active Care Items</div>
+            <div id="careList"></div>
+        </div>
+
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-box">
+            <p>Are you sure you want to delete this pet?</p>
+            <button id="confirmDeleteBtn">Yes, delete</button>
+            <button id="cancelDeleteBtn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ADD CARE MODAL -->
+    <div id="careModal" class="modal-overlay">
+        <div class="modal-box">
+
+            <p style="font-size:20px; font-weight:bold; margin-bottom:20px;">Add Care Item</p>
+
+            <div id="carePicker" class="picker-cards">
+                <div class="picker-card" data-value="Feeding">🍽 Feeding</div>
+                <div class="picker-card" data-value="Water">💧 Fresh Water</div>
+                <div class="picker-card" data-value="Cleaning">🧼 Cleaning</div>
+                <div class="picker-card" data-value="Custom">✏️ Custom</div>
+            </div>
+
+  <div id="careError" 
+     style="color:#e74c3c; font-weight:bold; margin-top:10px; display:none;">
+</div>
+
+            <input id="customInput" class="species-input-inline" 
+                   placeholder="Enter custom care item" style="display:none; margin-top:20px;">
+
+            <select id="timesSelect" class="species-input-inline" style="display:none; margin-top:20px;">
+                <option value="">How many times per day...</option>
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option value="3">3×</option>
+                <option value="4">4×</option>
+                <option value="5">5×</option>
+            </select>
+
+            <div id="careTimesContainer"></div>
+
+            <div class="care-btn-row">
+                <button id="saveCareItemBtn" class="action-btn" style="display:none;">Add</button>
+                <button id="cancelCareBtn" class="action-btn">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TIME POPUP -->
+    <div id="timePopupBg">
+        <div class="time-popup">
+            <h3>Select Time</h3>
+
+            <div class="time-popup-row">
+                <select id="popupHour"></select>
+                <span class="colon">:</span>
+                <select id="popupMinute"></select>
+            </div>
+
+            <div class="popup-btn-row">
+                <button class="popup-save-btn" onclick="savePopupTime()">Save</button>
+                <button class="popup-cancel-btn" onclick="closeTimePopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="location.href='Dashboard.html'">🏠</div>
+        <div class="nav-item" onclick="location.href='TeamProfile.html'">👥</div>
+        <div class="nav-item" onclick="location.href='PetProfile.html?id=' + petId">🐾</div>
+    </div>
+
+    <!-- ===========================
+         UPDATED JS
+    ============================ -->
+    <script>
+    /* ===========================
+   INITIALS → IMAGE GENERATOR
+=========================== */
+function generateInitialsImage(name, bgColor = "#8E44AD") {
+    const initials = name
+        .split(" ")
+        .map(n => n[0]?.toUpperCase() || "")
+        .join("")
+        .slice(0, 2) || "?";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 200;
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 200, 200);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 100px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, 100, 110);
+
+    return canvas.toDataURL("image/png");
+}
+
+/* ===========================
+   LOAD PET
+=========================== */
+
+const params = new URLSearchParams(window.location.search);
+const petId = Number(params.get("id"));
+
+let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+let care = JSON.parse(localStorage.getItem("care") || "[]");
+
+let pet = pets.find(p => Number(p.id) === petId);
+
+if (!pet) {
+    alert("Pet not found.");
+    window.location.href = "Dashboard.html";
+}
+
+/* ===========================
+   HEADER + PROFILE
+=========================== */
+
+document.getElementById("headerName").textContent = pet.name;
+document.getElementById("smallPhoto").src = pet.photo;
+
+// Name
+document.getElementById("nameInput").value = pet.name;
+
+// ⭐ Species dropdown load
+const speciesSelect = document.getElementById("speciesSelect");
+const speciesCustomInput = document.getElementById("speciesCustomInput");
+
+if (!pet.type) {
+    speciesSelect.value = "Dog";
+} else if (["Dog", "Cat", "Rabbit", "Bird", "Fish"].includes(pet.type)) {
+    speciesSelect.value = pet.type;
+} else {
+    speciesSelect.value = "Custom";
+    speciesCustomInput.style.display = "block";
+    speciesCustomInput.value = pet.type;
+}
+
+/* ===========================
+   SPECIES DROPDOWN TOGGLE
+=========================== */
+function toggleCustomSpecies() {
+    if (speciesSelect.value === "Custom") {
+        speciesCustomInput.style.display = "block";
+    } else {
+        speciesCustomInput.style.display = "none";
+        speciesCustomInput.value = "";
+    }
+}
+
+/* ===========================
+   CHANGE PHOTO
+=========================== */
+
+document.getElementById("changePhotoBtn").onclick = () => {
+    document.getElementById("photoFile").click();
+};
+
+document.getElementById("photoFile").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const base64 = event.target.result;
+        document.getElementById("smallPhoto").src = base64;
+        pet.photo = base64;
+    };
+    reader.readAsDataURL(file);
+};
+
+/* ===========================
+   SAVE PET
+=========================== */
+
+document.getElementById("saveBtn").onclick = () => {
+    const newName = document.getElementById("nameInput").value.trim();
+
+    const speciesDropdown = speciesSelect.value;
+    const speciesCustom = speciesCustomInput.value.trim();
+    const finalSpecies = (speciesDropdown === "Custom") ? speciesCustom : speciesDropdown;
+
+    pet.name = newName;
+    pet.type = finalSpecies;
+
+    // ⭐ If no photo uploaded, regenerate initials avatar
+    if (!pet.photo || pet.photo.trim() === "") {
+        pet.photo = generateInitialsImage(newName);
+    }
+
+    localStorage.setItem("pets", JSON.stringify(pets));
+    window.location.href = `PetProfile.html?id=${pet.id}`;
+};
+
+/* ===========================
+   TOGGLE REMOVE CARE SECTION
+=========================== */
+
+document.getElementById("editCareBtn").onclick = () => {
+    const removeSection = document.getElementById("removeCareSection");
+    const activeSection = document.getElementById("activeCareSection");
+
+    const isOpen = removeSection.style.display === "block";
+    removeSection.style.display = isOpen ? "none" : "block";
+    activeSection.style.display = isOpen ? "block" : "none";
+
+    document.getElementById("careModal").style.display = "none";
+};
+
+/* ===========================
+   RENDER REMOVE CARE LIST
+=========================== */
+
+function renderRemoveCareList() {
+    const list = document.getElementById("removeCareList");
+    list.innerHTML = "";
+
+    const petCare = care.filter(c => Number(c.petId) === petId);
+
+    if (petCare.length === 0) {
+        list.innerHTML = "<p>No care items to remove.</p>";
+        return;
+    }
+
+    petCare.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "task-row";
+
+        row.innerHTML = `
+            <div class="task-info">
+                <div class="task-title">${item.name}</div>
+                <div class="task-meta">${item.times}× Daily</div>
+            </div>
+            <button class="remove-btn">Remove</button>
+        `;
+
+        row.querySelector(".remove-btn").onclick = () => {
+            care = care.filter(c => c.id !== item.id);
+            localStorage.setItem("care", JSON.stringify(care));
+            renderRemoveCareList();
+            renderCareList();
+        };
+
+        list.appendChild(row);
+    });
+}
+
+/* ===========================
+   RENDER ACTIVE CARE LIST
+=========================== */
+
+function renderCareList() {
+    const list = document.getElementById("careList");
+    list.innerHTML = "";
+
+    const petCare = care.filter(c => Number(c.petId) === petId);
+
+    if (petCare.length === 0) {
+        list.innerHTML = "<p>No active care items.</p>";
+        return;
+    }
+
+    petCare.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "task-row";
+
+        let timesHTML = "";
+        item.schedule.forEach(t => {
+            timesHTML += `<div class="task-meta">⏰ ${t}</div>`;
+        });
+
+        row.innerHTML = `
+            <div class="task-info">
+                <div class="task-title">${item.name}</div>
+                <div class="task-meta">${item.times}× Daily</div>
+                ${timesHTML}
+            </div>
+        `;
+
+        list.appendChild(row);
+    });
+}
+
+renderRemoveCareList();
+renderCareList();
+
+/* ===========================
+   OPEN ADD CARE MODAL
+=========================== */
+
+document.getElementById("addCareBtn").onclick = () => {
+    document.getElementById("careModal").style.display = "flex";
+
+    document.getElementById("activeCareSection").style.display = "none";
+    document.getElementById("removeCareSection").style.display = "none";
+
+    selectedCare = null;
+    timeValues = [];
+
+    document.getElementById("customInput").style.display = "none";
+    document.getElementById("timesSelect").style.display = "none";
+    document.getElementById("careTimesContainer").innerHTML = "";
+    document.getElementById("saveCareItemBtn").style.display = "none";
+
+    document.getElementById("careError").style.display = "none";   // ⭐ reset error message
+
+    document.querySelectorAll(".picker-card")
+        .forEach(c => c.classList.remove("selected"));
+};
+
+document.getElementById("cancelCareBtn").onclick = () => {
+    document.getElementById("careModal").style.display = "none";
+    document.getElementById("activeCareSection").style.display = "block";
+};
+
+/* ===========================
+   CARD SELECTION
+=========================== */
+
+let selectedCare = null;
+
+document.querySelectorAll(".picker-card").forEach(card => {
+    card.onclick = () => {
+
+        document.querySelectorAll(".picker-card")
+            .forEach(c => c.classList.remove("selected"));
+
+        card.classList.add("selected");
+        selectedCare = card.dataset.value;
+
+        document.getElementById("customInput").style.display =
+            selectedCare === "Custom" ? "block" : "none";
+
+        document.getElementById("timesSelect").style.display = "block";
+    };
+});
+
+/* ===========================
+   TIME POPUP
+=========================== */
+
+let activeTimeIndex = null;
+let timeValues = [];
+
+function buildTimePopup() {
+    const hourSel = document.getElementById("popupHour");
+    const minSel = document.getElementById("popupMinute");
+
+    hourSel.innerHTML = "";
+    minSel.innerHTML = "";
+
+    for (let h = 0; h < 24; h++) {
+        const opt = document.createElement("option");
+        opt.value = h;
+        opt.textContent = h.toString().padStart(2, "0");
+        hourSel.appendChild(opt);
+    }
+
+    for (let m = 0; m < 60; m += 5) {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m.toString().padStart(2, "0");
+        minSel.appendChild(opt);
+    }
+}
+
+buildTimePopup();
+
+function openTimePopup(index) {
+    activeTimeIndex = index;
+    document.getElementById("timePopupBg").style.display = "flex";
+}
+
+function closeTimePopup() {
+    document.getElementById("timePopupBg").style.display = "none";
+}
+
+function savePopupTime() {
+    const h = document.getElementById("popupHour").value;
+    const m = document.getElementById("popupMinute").value;
+
+    timeValues[activeTimeIndex] = `${h.padStart(2,"0")}:${m.padStart(2,"0")}`;
+
+    document.getElementById(`timeDisplay${activeTimeIndex}`).textContent =
+        timeValues[activeTimeIndex];
+
+    closeTimePopup();
+}
+
+/* ===========================
+   TIMES PER DAY → TIME ROWS
+=========================== */
+
+document.getElementById("timesSelect").onchange = () => {
+    const container = document.getElementById("careTimesContainer");
+    const times = Number(document.getElementById("timesSelect").value);
+
+    container.innerHTML = "";
+    timeValues = [];
+
+    if (!times) {
+        document.getElementById("saveCareItemBtn").style.display = "none";
+        return;
+    }
+
+    for (let i = 0; i < times; i++) {
+        timeValues.push("07:00");
+
+        const row = document.createElement("div");
+        row.className = "time-setter-row";
+
+        row.innerHTML = `
+            <div class="time-inline">
+                <div id="timeDisplay${i}" class="time-display">${timeValues[i]}</div>
+                <button class="time-edit-btn" onclick="openTimePopup(${i})">Edit</button>
+            </div>
+        `;
+
+        container.appendChild(row);
+    }
+
+    document.getElementById("saveCareItemBtn").style.display = "block";
+};
+
+/* ===========================
+   SAVE CARE ITEM
+=========================== */
+
+document.getElementById("saveCareItemBtn").onclick = () => {
+
+    if (!selectedCare) return alert("Select a care item.");
+
+    let name = selectedCare;
+
+    if (name === "Custom") {
+        name = document.getElementById("customInput").value.trim();
+        if (!name) return alert("Enter custom care item.");
+    }
+
+    const times = Number(document.getElementById("timesSelect").value);
+    if (!times) return alert("Select how many times per day.");
+
+    /* ⭐ Prevent duplicate time slots */
+    const unique = new Set(timeValues);
+if (unique.size !== timeValues.length) {
+    const msg = document.getElementById("careError");
+    msg.textContent = "Duplicate time slots are not allowed. Please choose unique times.";
+    msg.style.display = "block";
+    return;
+}
+
+    care.push({
+        id: Date.now(),
+        petId,
+        name,
+        times,
+        schedule: timeValues
+    });
+
+    localStorage.setItem("care", JSON.stringify(care));
+
+    renderRemoveCareList();
+    renderCareList();
+
+    document.getElementById("careModal").style.display = "none";
+    document.getElementById("activeCareSection").style.display = "block";
+};
+
+/* ===========================
+   DELETE PET
+=========================== */
+
+document.getElementById("deleteIcon").onclick = () => {
+    document.getElementById("deleteModal").style.display = "flex";
+};
+
+document.getElementById("cancelDeleteBtn").onclick = () => {
+    document.getElementById("deleteModal").style.display = "none";
+};
+
+document.getElementById("confirmDeleteBtn").onclick = () => {
+    pets = pets.filter(p => Number(p.id) !== petId);
+    care = care.filter(c => Number(c.petId) !== petId);
+
+    localStorage.setItem("pets", JSON.stringify(pets));
+    localStorage.setItem("care", JSON.stringify(care));
+
+    window.location.href = "Dashboard.html";
+};
+    </script>
+
+</body>
+</html>
