@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Team Profile</title>
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #EAF3FF;
+    overflow: hidden;
+}
+
+/* HEADER */
+.header-profile {
+    background: #4A90E2;
+    padding: 16px;
+    color: white;
+    width: 100%;
+    height: 100px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-grow: 1;
+}
+
+.header-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.header-sub {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 2px;
+}
+
+.header-btn {
+    background: white;
+    color: #4A90E2;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ADD BUTTONS */
+.add-row {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    width: 92%;
+    margin: 0 auto;
+}
+
+.add-row button {
+    flex: 1;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 14px;
+    border: none;
+    background: #4A90E2;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.add-row button:hover {
+    background: #357ABD;
+}
+
+/* MENU */
+.action-menu {
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 92%;
+    margin: 12px auto;
+    display: none;
+    z-index: 10;
+}
+
+.action-menu button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: none;
+    background: #4A90E2;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.action-menu button:hover {
+    background: #357ABD;
+}
+
+/* POPUPS */
+.modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.modal-box {
+    background: white;
+    width: 85%;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+.modal-box h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #2C3E50;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.modal-box input {
+    width: 90%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #AFC7E8;
+    margin-bottom: 14px;
+    font-size: 16px;
+}
+
+.modal-box button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #4A90E2;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.modal-box button:hover {
+    background: #357ABD;
+}
+
+/* MAIN AREA */
+.scroll-area {
+    height: calc(100% - 280px);
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.section {
+    background: white;
+    padding: 18px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.section h2 {
+    margin: 0 0 14px 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2C3E50;
+}
+
+/* MEMBER ROW */
+.member-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.member-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.member-name {
+    font-size: 17px;
+    font-weight: bold;
+    color: #2C3E50;
+    flex: 1;
+}
+
+.assign-btn {
+    padding: 8px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: none;
+    background: #4A90E2;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: 0.2s;
+}
+
+.assign-btn:hover {
+    background: #357ABD;
+    transform: translateY(-2px);
+}
+
+/* PET ROW */
+.pet-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 17px;
+    color: #2C3E50;
+}
+
+/* Bottom nav */
+.bottom-nav {
+    background: #4A90E2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 22px;
+    padding: 0;
+    color: white;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+}
+
+.nav-item {
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 60px;
+    position: relative;
+}
+
+.notify-dot {
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+    border: 2px solid white;
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    z-index: 10;
+}
+
+ #newPetPreview[src=""] {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+} 
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header-profile">
+    <div class="header-left">
+        <img id="teamPhoto" class="header-photo">
+        <div class="header-info">
+            <div id="teamName" class="header-name"></div>
+            <div class="header-sub">Team Overview</div>
+        </div>
+    </div>
+
+    <button class="header-btn" onclick="toggleMenu()">⋮</button>
+</div>
+
+<!-- ADD BUTTONS -->
+<div class="add-row">
+    <button onclick="openAddUser()">Add User</button>
+    <button onclick="openAddPet()">Add Pet</button>
+</div>
+
+<!-- MENU -->
+<div id="actionMenu" class="action-menu">
+    <button onclick="applyFilter('users')">Users</button>
+    <button onclick="applyFilter('pets')">Pets</button>
+    <button onclick="applyFilter('all')">All</button>
+    <button onclick="openEditPopup()">Profile Edit</button>
+</div>
+
+<!-- POPUP: EDIT TEAM -->
+<div id="modalBg" class="modal-bg">
+    <div class="modal-box">
+        <h3>Edit Team Profile</h3>
+
+        <img id="teamPhotoPreview" class="member-photo" style="margin: 10px auto; display:none;">
+
+        <input id="teamNameInput" placeholder="Team name">
+
+        <button onclick="document.getElementById('teamPhotoInput').click()">Upload Photo</button>
+        <input type="file" id="teamPhotoInput" accept="image/*" style="display:none;">
+
+        <button onclick="saveTeamChanges()">Save Changes</button>
+        <button onclick="closeEditPopup()" style="background:#ccc;color:#333;">Cancel</button>
+    </div>
+</div>
+
+<!-- POPUP: ADD USER -->
+<div id="addUserBg" class="modal-bg">
+    <div class="modal-box">
+        <h3>Add User</h3>
+
+        <img id="newUserPreview" class="member-photo" style="margin: 10px auto; display:none;">
+
+        <input id="newUserName" placeholder="User name">
+
+  <div id="userError"
+     style="color:#e74c3c; font-weight:bold; margin-top:10px; display:none;">
+</div>  
+
+        <button onclick="document.getElementById('newUserPhoto').click()">Upload Photo</button>
+        <input type="file" id="newUserPhoto" accept="image/*" style="display:none;">
+
+        <button onclick="saveNewUser()">Add User</button>
+        <button onclick="closeAddUser()" style="background:#ccc;color:#333;">Cancel</button>
+    </div>
+</div>
+
+<!-- POPUP: ADD PET -->
+<div id="addPetBg" class="modal-bg">
+    <div class="modal-box">
+        <h3>Add Pet</h3>
+
+        <img id="newPetPreview"
+     style="
+        display:none;
+        width:50px;
+        height:50px;
+        border-radius:50%;
+        object-fit:cover;
+        margin: 10px auto;
+        display:block;
+        border:none;
+        box-shadow:none;
+     ">
+
+        <input id="newPetName" placeholder="Pet name">
+
+ <div id="petError"
+     style="color:#e74c3c; font-weight:bold; margin-top:10px; display:none;">
+</div>     
+
+        <button onclick="document.getElementById('newPetPhoto').click()">Upload Photo</button>
+        <input type="file" id="newPetPhoto" accept="image/*" style="display:none;">
+
+
+        <button onclick="saveNewPet()">Add Pet</button>
+        <button onclick="closeAddPet()" style="background:#ccc;color:#333;">Cancel</button>
+    </div>
+</div>
+
+<div class="scroll-area">
+    <div class="section" id="memberSection">
+        <h2>Members</h2>
+        <div id="memberList"></div>
+    </div>
+
+    <div class="section" id="petSection">
+        <h2>Pets</h2>
+        <div id="petList"></div>
+    </div>
+</div>
+
+<div id="upgradePopup" style="display:none; 
+     position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    
+    <div style="background:white; padding:25px; border-radius:14px; width:80%; max-width:320px; text-align:center;">
+        
+        <h2>Unlock Unlimited Pets</h2>
+
+        <button id="upgradeBtn"
+                style="width:100%; padding:12px; background:#4A90E2; color:white; border:none; border-radius:10px; font-weight:bold;">
+            Upgrade
+        </button>
+
+        <div style="margin:15px 0; font-weight:bold;">OR</div>
+
+        <input id="voucherInput" placeholder="Enter voucher code"
+               style="width:100%; padding:12px; border-radius:10px; border:1px solid #ccc; margin-bottom:10px;">
+
+        <button id="applyVoucherBtn"
+                style="width:100%; padding:12px; background:#6BB9F0; color:white; border:none; border-radius:10px; font-weight:bold;">
+            Apply Code
+        </button>
+
+        <div id="voucherError" style="color:#e74c3c; font-weight:bold; display:none; margin-top:10px;"></div>
+        <div id="voucherSuccess" style="color:#27ae60; font-weight:bold; display:none; margin-top:10px;"></div>
+    </div>
+</div>
+
+<!-- NAV -->
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='Dashboard.html'">🏠</div>
+    <div class="nav-item" onclick="location.href='TeamProfile.html'">👥</div>
+    <div class="nav-item" onclick="openPrimaryUser()">🧑</div>
+    
+</div>
+
+<script src="premium.js"></script>
+
+<script>
+
+/* MENU TOGGLE */
+function toggleMenu() {
+    const menu = document.getElementById("actionMenu");
+    const scrollArea = document.querySelector(".scroll-area");
+    const addRow = document.querySelector(".add-row");
+
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+        scrollArea.style.display = "block";
+        addRow.style.display = "flex";
+    } else {
+        menu.style.display = "block";
+        scrollArea.style.display = "none";
+        addRow.style.display = "none";
+    }
+}
+
+function applyFilter(type) {
+    const menu = document.getElementById("actionMenu");
+    const scrollArea = document.querySelector(".scroll-area");
+    const addRow = document.querySelector(".add-row");
+
+    menu.style.display = "none";
+    scrollArea.style.display = "block";
+    addRow.style.display = "flex";
+
+    document.getElementById("memberSection").style.display = (type === "pets") ? "none" : "block";
+    document.getElementById("petSection").style.display = (type === "users") ? "none" : "block";
+}
+
+/* INITIALS IMAGE */
+function generateInitialsImage(name, bgColor) {
+    const initials = name
+        .split(" ")
+        .map(n => n[0]?.toUpperCase() || "")
+        .join("")
+        .slice(0, 2) || "?";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 200;
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 200, 200);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 100px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, 100, 110);
+
+    return canvas.toDataURL("image/png");
+}
+
+/* TEAM EDIT POPUP */
+function openEditPopup() {
+    document.getElementById("modalBg").style.display = "flex";
+
+    let team = JSON.parse(localStorage.getItem("team") || "null");
+    if (team) {
+        document.getElementById("teamNameInput").value = team.name || "";
+    }
+
+    document.getElementById("actionMenu").style.display = "none";
+    document.querySelector(".scroll-area").style.display = "block";
+    document.querySelector(".add-row").style.display = "flex";
+}
+
+function closeEditPopup() {
+    document.getElementById("modalBg").style.display = "none";
+    document.getElementById("teamPhotoPreview").style.display = "none";
+    document.getElementById("teamPhotoPreview").src = "";
+    document.getElementById("teamPhotoInput").value = "";
+    window._teamNewPhoto = "";
+}
+
+document.getElementById("teamPhotoInput").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const preview = document.getElementById("teamPhotoPreview");
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+        window._teamNewPhoto = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+function saveTeamChanges() {
+    let team = JSON.parse(localStorage.getItem("team") || "null");
+    if (!team) team = {};
+
+    const newName = document.getElementById("teamNameInput").value.trim();
+
+    if (newName) {
+        team.name = newName;
+        document.getElementById("teamName").innerText = newName;
+    }
+
+    if (window._teamNewPhoto) {
+        team.photo = window._teamNewPhoto;
+        document.getElementById("teamPhoto").src = team.photo;
+    }
+
+    localStorage.setItem("team", JSON.stringify(team));
+    closeEditPopup();
+}
+
+/* ADD USER POPUP */
+function openAddUser() {
+
+  document.getElementById("userError").style.display = "none";
+  document.getElementById("addUserBg").style.display = "flex";
+}
+
+function closeAddUser() {
+    document.getElementById("addUserBg").style.display = "none";
+    document.getElementById("newUserPreview").style.display = "none";
+    document.getElementById("newUserPreview").src = "";
+    document.getElementById("newUserPhoto").value = "";
+    window._newUserPhoto = "";
+}
+
+document.getElementById("newUserPhoto").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const preview = document.getElementById("newUserPreview");
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+        window._newUserPhoto = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+function saveNewUser() {
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+    const name = document.getElementById("newUserName").value.trim();
+
+    if (!name) {
+    const msg = document.getElementById("userError");
+    msg.textContent = "Please enter a name.";
+    msg.style.display = "block";
+    return;
+}
+
+    const newUser = {
+        id: Date.now(),
+        name: name,
+        photo: window._newUserPhoto || generateInitialsImage(name, "#4A90E2")
+    };
+
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+    addUserToList(newUser);
+
+    document.getElementById("newUserName").value = "";
+    closeAddUser();
+}
+
+/* ADD PET POPUP */
+function openAddPet() {
+
+if (!canAddPet()) {
+    showUpgradePopup();
+    return;
+}
+    document.getElementById("petError").style.display = "none";
+    document.getElementById("addPetBg").style.display = "flex";
+
+    const preview = document.getElementById("newPetPreview");
+    preview.src = "";
+    preview.style.display = "none";
+}
+
+function closeAddPet() {
+    document.getElementById("addPetBg").style.display = "none";
+
+    const preview = document.getElementById("newPetPreview");
+    preview.src = "";
+    preview.style.display = "none";
+
+    // remove border when empty
+    preview.style.border = "none";
+    preview.style.boxShadow = "none";
+
+    document.getElementById("newPetPhoto").value = "";
+    window._newPetPhoto = "";
+}
+
+document.getElementById("newPetPhoto").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const preview = document.getElementById("newPetPreview");
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+
+        // add border AFTER uploading
+        preview.style.border = "3px solid #4A90E2";
+        preview.style.boxShadow = "0 2px 6px rgba(0,0,0,0.15)";
+
+        window._newPetPhoto = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+function saveNewPet() {
+    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+
+    const name = document.getElementById("newPetName").value.trim();
+
+    if (!name) {
+    const msg = document.getElementById("petError");
+    msg.textContent = "Please enter a pet name.";
+    msg.style.display = "block";
+    return;
+}
+
+    const newPet = {
+        id: Date.now(),
+        name: name,
+        photo: window._newPetPhoto || generateInitialsImage(name, "#8E44AD")
+    };
+
+    pets.push(newPet);
+    localStorage.setItem("pets", JSON.stringify(pets));
+    addPetToList(newPet);
+
+    document.getElementById("newPetName").value = "";
+    closeAddPet();
+}
+
+
+/* RENDER USER */
+function addUserToList(u) {
+    const memberList = document.getElementById("memberList");
+
+    const row = document.createElement("div");
+    row.className = "member-row";
+
+    const photo = document.createElement("img");
+    photo.className = "member-photo";
+    photo.src = u.photo;
+
+    const name = document.createElement("div");
+    name.className = "member-name";
+    name.innerText = u.name;
+
+    const assignBtn = document.createElement("button");
+    assignBtn.className = "assign-btn";
+    assignBtn.innerText = "Assign";
+    assignBtn.onclick = (event) => {
+        event.stopPropagation();
+        location.href = `PrimaryAssignTasks.html?user=${u.id}`;
+    };
+
+    row.appendChild(photo);
+    row.appendChild(name);
+    row.appendChild(assignBtn);
+
+    row.onclick = () => location.href = `UserProfile.html?id=${u.id}`;
+
+    memberList.appendChild(row);
+}
+
+/* RENDER PET */
+function addPetToList(p) {
+    const petList = document.getElementById("petList");
+
+    const row = document.createElement("div");
+    row.className = "pet-row";
+
+    const photoWrapper = document.createElement("div");
+    photoWrapper.style.position = "relative";
+    photoWrapper.style.display = "inline-block";
+    photoWrapper.style.width = "50px";
+    photoWrapper.style.height = "50px";
+
+    const photo = document.createElement("img");
+    photo.className = "member-photo";
+    photo.style.width = "50px";
+    photo.style.height = "50px";
+    photo.style.borderRadius = "50%";
+    photo.src = p.photo;
+
+    photo.onclick = () => {
+        window.location.href = `PetProfile.html?id=${p.id}`;
+    };
+
+    photoWrapper.appendChild(photo);
+
+    let care = JSON.parse(localStorage.getItem("care") || "[]");
+    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+
+    const petCare = care.filter(c => String(c.petId) === String(p.id));
+
+    const unassignedCare = petCare.filter(c => {
+        return !assigned.some(a => a.careId === c.id);
+    });
+
+    if (unassignedCare.length > 0) {
+        const photoDot = document.createElement("span");
+        photoDot.className = "notify-dot";
+        photoDot.style.position = "absolute";
+        photoDot.style.top = "-3px";
+        photoDot.style.right = "-3px";
+        photoWrapper.appendChild(photoDot);
+    }
+
+    const name = document.createElement("div");
+    name.innerText = p.name;
+
+    row.appendChild(photoWrapper);
+    row.appendChild(name);
+
+    if (unassignedCare.length > 0) {
+        const careList = document.createElement("div");
+        careList.style.fontSize = "14px";
+        careList.style.color = "#555";
+        careList.style.marginLeft = "60px";
+
+        unassignedCare.forEach(item => {
+            const line = document.createElement("div");
+            line.textContent = "• " + item.name;
+            careList.appendChild(line);
+        });
+
+        row.appendChild(careList);
+    }
+
+    petList.appendChild(row);
+}
+
+/* PAGE LOAD */
+document.addEventListener("DOMContentLoaded", () => {
+    let team = JSON.parse(localStorage.getItem('team') || "null");
+    let users = JSON.parse(localStorage.getItem('users') || "[]");
+    let pets = JSON.parse(localStorage.getItem('pets') || "[]");
+
+    if (!team) {
+        alert("Team not found. Please run startup.");
+        return;
+    }
+
+    document.getElementById("teamPhoto").src = team.photo || "assets/default-team.svg";
+    document.getElementById("teamName").innerText = team.name || "";
+
+    users.forEach(u => addUserToList(u));
+    pets.forEach(p => addPetToList(p));
+});
+
+function openPrimaryUser() {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.length === 0) return;
+    const primary = users[0];
+    location.href = `UserProfile.html?id=${primary.id}`;
+}
+  
+</script>
+
+</body>
+</html>
