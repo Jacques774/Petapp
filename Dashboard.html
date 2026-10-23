@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unified Pet Dashboard</title>
+
+<style>
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #EAF3FF;
+}
+
+/* HEADER */
+.welcome-bar,
+.bottom-nav {
+    background: #4A90E2;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ⭐ Dashboard header (warm message) */
+.welcome-bar {
+    text-align: center;
+    cursor: pointer;
+
+    height: 60px;
+    line-height: 60px;
+
+    overflow: hidden;
+    white-space: nowrap;
+
+    font-size: 16px;
+}
+
+/* ⭐ Bottom bar — EXACT MATCH to User Profile */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    font-size: 22px;
+    padding: 0;
+    color: white;
+}
+
+/* ⭐ Nav item — same structure as User Profile */
+.nav-item {
+    text-align: center;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 60px;
+    position: relative;
+}
+
+/* ⭐ Notification dot */
+.notify-dot {
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+    border: 2px solid white;
+    position: absolute;
+
+    top: 7px;
+    right: 7px;
+
+    z-index: 10;
+}
+
+/* DASHBOARD CONTENT */
+.dashboard {
+    width: 92%;
+    margin: auto;
+    height: calc(100vh - 110px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* PET GRID */
+.pet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+    margin-top: 15px;
+}
+
+/* PET CARD */
+.pet-card {
+    background: #FFFFFF;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* LEFT SIDE */
+.pet-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 110px;
+}
+
+.pet-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+    cursor: pointer;
+}
+
+.pet-name {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2C3E50;
+    text-align: center;
+}
+
+/* RIGHT SIDE */
+.pet-right {
+    flex: 1;
+}
+
+.task-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2C3E50;
+    margin-bottom: 10px;
+}
+
+.pet-task-item {
+    font-size: 15px;
+    color: #1A4C7C;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-amount {
+    color: #4A90E2;
+    font-weight: bold;
+}
+
+/* ⭐ Popup shared styles */
+.popup-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.popup-box {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    font-family: Arial;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.popup-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* ⭐ Reset Day standout animation */
+.reset-alert {
+    animation: resetPulse 1.6s infinite, resetBounce 2.4s infinite;
+}
+
+@keyframes resetPulse {
+    0% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.0); }
+    50% { box-shadow: 0 0 14px rgba(255, 255, 255, 0.95); }
+    100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.0); }
+}
+
+@keyframes resetBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+  
+</style>
+</head>
+
+<body>
+
+<div class="welcome-bar" id="welcomeBar"></div>
+
+<div class="dashboard">
+    <div class="pet-grid" id="petGrid"></div>
+</div>
+
+<div class="bottom-nav">
+
+    <div class="nav-item" onclick="location.href='Dashboard.html'">
+        <span>🏠</span>
+    </div>
+
+    <div class="nav-item" id="teamIcon" onclick="location.href='TeamProfile.html'">
+        <span>👥</span>
+        <div class="notify-dot"></div>
+    </div>
+
+    <div class="nav-item" onclick="openPrimaryUser()">
+        <span>🧑</span>
+    </div>
+
+    <div class="nav-item" onclick="checkIfAllTasksDone()" id="resetNavItem">
+    <span>🔄</span>
+</div>
+
+</div>
+
+<!-- ⭐ Normal Reset Popup -->
+<div id="resetPopup" class="popup-overlay">
+    <div class="popup-box">
+        <div style="font-size:18px;font-weight:bold;margin-bottom:10px;">Reset Today?</div>
+        <div style="font-size:14px;color:#444;margin-bottom:20px;">
+            This will clear all ✔️ ticks for today.<br>Logs will stay safe.
+        </div>
+
+        <button class="popup-btn" style="background:#4A90E2;color:white;" onclick="confirmResetDay()">
+            Yes, Reset
+        </button>
+
+        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeResetPopup()">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<!-- ⭐ Warning Popup -->
+<div id="warningPopup" class="popup-overlay">
+    <div class="popup-box">
+        <div style="font-size:18px;font-weight:bold;margin-bottom:10px;">Tasks Not Completed</div>
+        <div style="font-size:14px;color:#444;margin-bottom:20px;">
+            Some tasks are still unfinished.<br>Reset anyway?
+        </div>
+
+        <button class="popup-btn" style="background:#E74C3C;color:white;" onclick="confirmResetDay()">
+            Yes, Reset Anyway
+        </button>
+
+        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeWarningPopup()">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<script>
+/* ⭐ Reset Notification: Glow + Pulse + Bounce */
+function notifyResetNeeded() {
+    const today = new Date().toDateString();
+    const lastReset = localStorage.getItem("lastReset");
+
+    const resetBtn = document.getElementById("resetNavItem");
+
+    if (lastReset !== today) {
+        resetBtn.classList.add("reset-alert");
+    } else {
+        resetBtn.classList.remove("reset-alert");
+    }
+}
+
+
+// @ts-nocheck
+
+/* ⭐ Warm Message System */
+function setWarmMessage() {
+    const header = document.getElementById("welcomeBar");
+
+    const messages = [
+        "🐾 Your pets are lucky to have you.",
+        "💙 Today feels like a good day.",
+        "🌼 A calm day for you and your pets.",
+        "☀️ Hope today treats you kindly.",
+        "🐶 Your pets appreciate you more than you know.",
+        "🌿 Slow and steady — you’re doing great.",
+        "✨ You’re keeping everything running smoothly.",
+        "🧡 A peaceful day starts with you.",
+        "🌞 You bring good energy to your pets.",
+        "🐾 Everything feels in harmony today."
+    ];
+
+    const pick = messages[Math.floor(Math.random() * messages.length)];
+    header.innerHTML = pick;
+}
+
+function randomInterval() {
+    return Math.floor(Math.random() * ((120*60*1000) - (5*60*1000))) + (5*60*1000);
+}
+
+function scheduleRandomMessageChange() {
+    setTimeout(() => {
+        setWarmMessage();
+        scheduleRandomMessageChange();
+    }, randomInterval());
+}
+
+/* ⭐ Unified Notification Logic */
+function updateTeamIconNotification() {
+    const teamIcon = document.getElementById("teamIcon");
+    if (!teamIcon) return;
+
+    let care = JSON.parse(localStorage.getItem("care") || "[]");
+    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+
+    const anyUnassigned = care.some(c =>
+        !assigned.some(a => a.careId === c.id)
+    );
+
+    const oldDot = teamIcon.querySelector(".notify-dot");
+    if (oldDot) oldDot.remove();
+
+    if (anyUnassigned) {
+        const dot = document.createElement("span");
+        dot.className = "notify-dot";
+        dot.style.position = "absolute";
+        dot.style.top = "7px";
+        dot.style.right = "7px";
+        teamIcon.style.position = "relative";
+        teamIcon.appendChild(dot);
+    }
+}
+
+/* ⭐ Dashboard Logic */
+document.addEventListener("DOMContentLoaded", () => {
+
+    notifyResetNeeded();
+    setInterval(notifyResetNeeded, 60000);
+
+    setWarmMessage();
+    scheduleRandomMessageChange();
+    document.getElementById("welcomeBar").onclick = () => setWarmMessage();
+
+    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+    let care = JSON.parse(localStorage.getItem("care") || "[]");
+    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
+
+    function extractPetId(item) {
+        for (const key in item) {
+            if (key.toLowerCase().includes("pet")) return item[key];
+        }
+        return null;
+    }
+
+    function getTaskIcon(name) {
+        name = name.toLowerCase();
+        if (name.includes("feed")) return "🍽";
+        if (name.includes("water")) return "💧";
+        if (name.includes("walk")) return "🚶";
+        if (name.includes("med")) return "💊";
+        if (name.includes("clean")) return "🧼";
+        if (name.includes("groom")) return "✂️";
+        return "🐾";
+    }
+
+    function todayKey() {
+        return new Date().toISOString().split("T")[0];
+    }
+
+    function getCompletedCountToday(petId, careId) {
+        return petLogs.filter(log =>
+            log.petId === petId &&
+            log.careId === careId &&
+            log.date === todayKey()
+        ).length;
+    }
+
+    const petGrid = document.getElementById("petGrid");
+    petGrid.innerHTML = "";
+
+    pets.forEach(pet => {
+
+        const petTasks = care.filter(c => Number(extractPetId(c)) === Number(pet.id));
+
+        const hasUnassignedCare = petTasks.some(t =>
+            !assigned.some(a => a.careId === t.id)
+        );
+
+        const card = document.createElement("div");
+        card.className = "pet-card";
+
+        let photoHTML = `
+            <div class="pet-left">
+                <div class="photo-wrapper" style="position:relative; display:inline-block;">
+                    <img class="pet-photo" src="${pet.photo}" onclick="window.location.href='PetProfile.html?id=${pet.id}'">
+                    ${hasUnassignedCare ? `<span class="notify-dot"></span>` : ""}
+                </div>
+                <div class="pet-name">${pet.name}</div>
+            </div>
+        `;
+
+        let html = photoHTML + `
+            <div class="pet-right">
+                <div class="task-header">Daily Tasks</div>
+        `;
+
+        petTasks.forEach(t => {
+            const total = t.times;
+            const done = getCompletedCountToday(pet.id, t.id);
+
+            let ticks = "";
+            for (let i = 0; i < done; i++) {
+                ticks += "<span style='color:green; font-size:18px;'>✔️</span>";
+            }
+
+            html += `
+                <div class="pet-task-item">
+                    ${getTaskIcon(t.name)} ${t.name}
+                    <span class="task-amount">(${total}x)</span> 
+                    ${ticks}
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        card.innerHTML = html;
+        petGrid.appendChild(card);
+    });
+
+    updateTeamIconNotification();
+});
+
+/* ⭐ Primary User Navigation */
+function openPrimaryUser() {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.length === 0) return;
+    window.location.href = `UserProfile.html?id=${users[0].id}`;
+}
+
+/* ⭐ Reset Popup Logic */
+function openResetPopup() {
+    document.getElementById("resetPopup").style.display = "flex";
+}
+
+function closeResetPopup() {
+    document.getElementById("resetPopup").style.display = "none";
+}
+
+function openWarningPopup() {
+    document.getElementById("warningPopup").style.display = "flex";
+}
+
+function closeWarningPopup() {
+    document.getElementById("warningPopup").style.display = "none";
+}
+
+/* ⭐ Smart Reset: Check if all tasks done */
+function checkIfAllTasksDone() {
+    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+    let care = JSON.parse(localStorage.getItem("care") || "[]");
+    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
+
+    function todayKey() {
+        return new Date().toISOString().split("T")[0];
+    }
+
+    let totalTasks = 0;
+    let completedTasks = 0;
+
+    pets.forEach(pet => {
+        const petTasks = care.filter(c => Number(c.petId) === Number(pet.id));
+
+        petTasks.forEach(t => {
+            totalTasks += t.times;
+
+            const done = petLogs.filter(log =>
+                log.petId === pet.id &&
+                log.careId === t.id &&
+                log.date === todayKey()
+            ).length;
+
+            completedTasks += done;
+        });
+    });
+
+    if (completedTasks >= totalTasks) {
+        openResetPopup();
+    } else {
+        openWarningPopup();
+    }
+}
+
+/* ⭐ Confirm Reset — FINAL FIX */
+function confirmResetDay() {
+
+    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // ⭐ Yesterday date (so Today filter is empty)
+    let yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yDate = yesterday.toISOString().split("T")[0];
+
+    // ⭐ 1. Move ALL today's logs to yesterday (keep user + task EXACTLY)
+    petLogs = petLogs.map(log => {
+        if (log.date === today) {
+            return {
+                ...log,
+                date: yDate
+            };
+        }
+        return log;
+    });
+
+    localStorage.setItem("petLogs", JSON.stringify(petLogs));
+
+    // ⭐ 2. Remove UI ticks (Dashboard)
+    document.querySelectorAll(".pet-task-item span").forEach(tick => {
+        if (tick.textContent === "✔️") tick.remove();
+    });
+
+    // ⭐ 3. Change User Profile buttons to blue
+    localStorage.setItem("userProfileButtons", "blue");
+
+    // ⭐ 4. Mark today as reset
+    localStorage.setItem("lastReset", new Date().toDateString());
+
+    // ⭐ 5. Close popups
+    closeResetPopup();
+    closeWarningPopup();
+
+    // ⭐ 6. Remove glow
+    document.getElementById("resetNavItem").classList.remove("reset-alert");
+
+    // ⭐ 7. Reload AFTER everything is saved
+    location.reload();
+}
+</script>
+  
+
+</body>
+</html>
