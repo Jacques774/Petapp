@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Startup</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #4A90E2, #6BB9F0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #2C3E50;
+    }
+
+    .welcome-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        padding: 12px 18px;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .box {
+        background: white;
+        padding: 30px;
+        border-radius: 18px;
+        width: 75%;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+        font-size: 26px;
+        color: #2C3E50;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 90%;
+        padding: 14px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        border: 1px solid #AFC7E8;
+        font-size: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .upload-btn {
+        width: 100%;
+        padding: 14px;
+        background: #6BB9F0;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .upload-btn:hover {
+        background: #4A90E2;
+        transform: translateY(-2px);
+    }
+
+    .preview-photo {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 10px auto 20px auto;
+        display: none;
+        border: 3px solid #4A90E2;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        background: #4A90E2;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 17px;
+        cursor: pointer;
+        font-weight: bold;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #357ABD;
+        transform: translateY(-2px);
+    }
+</style>
+</head>
+<body>
+
+<div class="welcome-bar">
+    🐾 Welcome to PetCare
+</div>
+
+<div class="box">
+    <h1>Create Your Profile</h1>
+
+    <img id="previewPhoto" class="preview-photo">
+
+    <input id="nameInput" placeholder="Your name">
+
+    <!-- ⭐ Inline red error -->
+    <div id="startupError"
+         style="color:#e74c3c; font-weight:bold; margin-top:10px; display:none;">
+    </div>
+
+    <button class="upload-btn" onclick="document.getElementById('photoFile').click()">Upload Photo</button>
+    <input type="file" id="photoFile" accept="image/*" style="display:none;">
+
+    <button id="saveBtn">Save & Continue</button>
+</div>
+
+<script>
+/* ===========================
+   INITIALS → IMAGE GENERATOR
+=========================== */
+function generateInitialsImage(name) {
+    const initials = name
+        .split(" ")
+        .map(n => n[0]?.toUpperCase() || "")
+        .join("")
+        .slice(0, 2);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 200;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#4A90E2";
+    ctx.fillRect(0, 0, 200, 200);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 100px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, 100, 110);
+
+    return canvas.toDataURL("image/png");
+}
+
+/* ===========================
+   PHOTO UPLOAD PREVIEW
+=========================== */
+let uploadedPhoto = "";
+
+document.getElementById("photoFile").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        uploadedPhoto = event.target.result;
+        const preview = document.getElementById("previewPhoto");
+        preview.src = uploadedPhoto;
+        preview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+};
+
+/* ===========================
+   HIDE ERROR WHEN TYPING
+=========================== */
+document.getElementById("nameInput").oninput = () => {
+    document.getElementById("startupError").style.display = "none";
+};
+
+/* ===========================
+   SAVE PROFILE
+=========================== */
+document.getElementById("saveBtn").onclick = () => {
+
+    const name = document.getElementById("nameInput").value.trim();
+
+    if (!name) {
+        const msg = document.getElementById("startupError");
+        msg.textContent = "Please enter your name.";
+        msg.style.display = "block";
+        return;
+    }
+
+    const finalPhoto = uploadedPhoto || generateInitialsImage(name);
+
+    const primaryUser = {
+        id: Date.now(),
+        name,
+        photo: finalPhoto,
+        role: "Owner"
+    };
+
+    localStorage.setItem("users", JSON.stringify([primaryUser]));
+
+    const team = {
+        name: "Team",
+        photo: generateInitialsImage("Team")
+    };
+    localStorage.setItem("team", JSON.stringify(team));
+
+    localStorage.setItem("pets", JSON.stringify([]));
+    localStorage.setItem("care", JSON.stringify([]));
+    localStorage.setItem("activity", JSON.stringify([]));
+
+    window.location.href = "dashboard.html";
+};
+</script>
+
+</body>
+</html>
