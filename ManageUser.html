@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage User</title>
+
+<style>
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #EAF3FF;
+}
+
+/* HEADER */
+.welcome-bar {
+    background: #4A90E2;
+    padding: 14px 18px;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* ⭐ Header Left Controls (Share Button) */
+.header-left-controls {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-header-btn {
+    background: rgba(255, 255, 255, 0.25);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.share-header-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.delete-icon-header {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #FFB3B3;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #8B0000;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+.container {
+    width: 92%;
+    margin: 20px auto 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    height: calc(100% - 160px);
+    overflow-y: auto;
+}
+
+/* PROFILE ROW */
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.photo-wrapper-small {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.small-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+}
+
+.change-photo-btn-small {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: #4A90E2;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.name-input-inline {
+    flex: 1;
+    width: 80%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #AFC7E8;
+    font-size: 16px;
+}
+
+/* BUTTON */
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    background: #4A90E2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.action-btn:hover {
+    background: #357ABD;
+}
+
+/* SECTION */
+.section {
+    background: white;
+    padding: 15px;
+    border-radius: 14px;
+    margin-top: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.section h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #2C3E50;
+}
+
+/* TASK CARD */
+.task-row {
+    background: #FFFFFF;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #D7E4F7;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+
+.task-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #2C3E50;
+}
+
+.task-meta {
+    font-size: 14px;
+    color: #4A90E2;
+}
+
+.pet-photo-small {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4A90E2;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* DELETE MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+#cancelDeleteBtn {
+    background: #ccc;
+}
+
+#confirmDeleteBtn {
+    background: #e74c3c;
+    color: white;
+}
+
+/* UNIFIED BOTTOM NAV */
+.bottom-nav {
+    background: #4A90E2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    font-size: 22px;
+    padding: 0;
+    color: white;
+
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+}
+
+.nav-item {
+    text-align: center;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 60px;
+    position: relative;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.4s ease, bottom 0.4s ease;
+    z-index: 9999;
+}
+.toast.show {
+    opacity: 1;
+    bottom: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="welcome-bar">
+    <div class="header-left-controls">
+        <button id="shareProfileBtn" class="share-header-btn" title="Share Profile">🔗</button>
+    </div>
+
+    Manage <span id="headerName"></span> Profile
+    
+    <div id="deleteIcon" class="delete-icon-header" title="Delete User">🗑️</div>
+</div>
+
+<div class="container">
+
+    <!-- PROFILE ROW -->
+    <div class="profile-row">
+        <div class="photo-wrapper-small">
+            <img id="smallPhoto" class="small-photo">
+            <div id="changePhotoBtn" class="change-photo-btn-small">📸</div>
+            <input type="file" id="photoFile" accept="image/*" style="display:none;">
+        </div>
+
+        <input id="nameInput" class="name-input-inline" placeholder="User name">
+    </div>
+
+    <button id="saveBtn" class="action-btn">Save Changes</button>
+
+    <!-- ASSIGNED TASKS -->
+    <div class="section">
+        <h3>Assigned Care Tasks</h3>
+        <div id="assignedList"></div>
+    </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='Dashboard.html'">🏠</div>
+    <div class="nav-item" onclick="location.href='TeamProfile.html'">👥</div>
+    <div class="nav-item" onclick="openPrimaryUser()">🧑</div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <p>Are you sure you want to delete this user?</p>
+        <button id="confirmDeleteBtn">Yes, delete</button>
+        <button id="cancelDeleteBtn">Cancel</button>
+    </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const userId = Number(params.get("id"));
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+let pets = JSON.parse(localStorage.getItem("pets") || "[]");
+let care = JSON.parse(localStorage.getItem("care") || "[]");
+let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+
+let user = users.find(u => Number(u.id) === userId);
+
+if (!user) {
+    alert("User not found.");
+    window.location.href = "Dashboard.html";
+}
+
+/* HEADER NAME */
+document.getElementById("headerName").textContent = user.name;
+
+/* PROFILE ROW */
+document.getElementById("smallPhoto").src = user.photo;
+document.getElementById("nameInput").value = user.name;
+
+/* CHANGE PHOTO */
+document.getElementById("changePhotoBtn").onclick = () => {
+    document.getElementById("photoFile").click();
+};
+
+document.getElementById("photoFile").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const base64 = event.target.result;
+        document.getElementById("smallPhoto").src = base64;
+        user.photo = base64;
+    };
+    reader.readAsDataURL(file);
+};
+
+/* SAVE CHANGES */
+document.getElementById("saveBtn").onclick = () => {
+    user.name = document.getElementById("nameInput").value.trim();
+    localStorage.setItem("users", JSON.stringify(users));
+    window.location.href = `UserProfile.html?id=${user.id}`;
+};
+
+/* SHARE PROFILE LINK BUTTON */
+document.getElementById("shareProfileBtn").onclick = () => {
+    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+    const profileUrl = `${baseUrl}/UserProfile.html?id=${user.id}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: `${user.name}'s PetCare Profile`,
+            text: `Hi ${user.name}! Here is your personal link to check off your pet care tasks:`,
+            url: profileUrl,
+        }).catch((error) => console.log("Sharing failed", error));
+    } else {
+        navigator.clipboard.writeText(profileUrl).then(() => {
+            showToast(`Copied ${user.name}'s profile link!`);
+        }).catch(() => {
+            prompt("Copy this link to share with family:", profileUrl);
+        });
+    }
+};
+
+/* RENDER ASSIGNED TASKS */
+function renderAssignedTasks() {
+    const list = document.getElementById("assignedList");
+    list.innerHTML = "";
+
+    const userTasks = assigned.filter(a => Number(a.userId) === Number(userId));
+
+    if (userTasks.length === 0) {
+        list.innerHTML = "<p>No tasks assigned.</p>";
+        return;
+    }
+
+    userTasks.forEach(task => {
+        const pet = pets.find(p => Number(p.id) === Number(task.petId));
+        const careItem = care.find(c => Number(c.id) === Number(task.careId));
+
+        if (!pet || !careItem) return;
+
+        const row = document.createElement("div");
+        row.className = "task-row";
+
+        row.innerHTML = `
+            <img src="${pet.photo}" class="pet-photo-small">
+            <div class="task-info">
+                <div class="task-title">${careItem.name}</div>
+                <div class="task-meta">Pet: ${pet.name}</div>
+                <div class="task-meta">${careItem.times}× Daily</div>
+            </div>
+            <button class="remove-btn">Remove</button>
+        `;
+
+        row.querySelector(".remove-btn").onclick = () => {
+            assigned = assigned.filter(a => a.id !== task.id);
+            localStorage.setItem("assigned", JSON.stringify(assigned));
+            renderAssignedTasks();
+        };
+
+        list.appendChild(row);
+    });
+}
+
+renderAssignedTasks();
+
+/* DELETE USER */
+const isPrimary = users.length > 0 && userId === users[0].id;
+
+if (isPrimary) {
+    document.getElementById("deleteIcon").style.display = "none";
+}
+
+document.getElementById("deleteIcon").onclick = () => {
+    document.getElementById("deleteModal").style.display = "flex";
+};
+
+document.getElementById("cancelDeleteBtn").onclick = () => {
+    document.getElementById("deleteModal").style.display = "none";
+};
+
+document.getElementById("confirmDeleteBtn").onclick = () => {
+    if (isPrimary) {
+        alert("The primary user cannot be deleted.");
+        document.getElementById("deleteModal").style.display = "none";
+        return;
+    }
+
+    users = users.filter(u => u.id !== userId);
+    localStorage.setItem("users", JSON.stringify(users));
+
+    assigned = assigned.filter(a => a.userId !== userId);
+    localStorage.setItem("assigned", JSON.stringify(assigned));
+
+    window.location.href = "Dashboard.html";
+};
+
+function openPrimaryUser() {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.length === 0) return;
+    const primary = users[0];
+    window.location.href = `UserProfile.html?id=${primary.id}`;
+}
+
+/* Toast */
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+    }, 2500);
+}
+</script>
+
+</body>
+</html>
