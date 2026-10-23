@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pet Profile</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #EAF3FF;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* HEADER — SAME DESIGN AS USER PROFILE */
+.header-bar {
+    background: #4A90E2;
+    padding: 16px;
+    color: white;
+    width: 100%;
+    height: 100px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.pet-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.pet-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.pet-species {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 2px;
+}
+
+.edit-icon {
+    background: white;
+    color: #4A90E2;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* MAIN CONTENT */
+.container {
+    width: 92%;
+    margin: auto;
+    padding-bottom: 120px;
+    height: calc(100% - 120px);
+    overflow-y: auto;
+}
+
+.log-btn {
+    width: 100%;
+    padding: 12px;
+    background: #4A90E2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.section {
+    background: white;
+    padding: 15px;
+    border-radius: 14px;
+    margin-top: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.section h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #2C3E50;
+}
+
+/* CARE ITEM CARD */
+.care-item {
+    background: #FFFFFF;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #D7E4F7;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.care-title {
+    font-weight: bold;
+    font-size: 17px;
+    color: #2C3E50;
+    margin-bottom: 6px;
+}
+
+.care-meta {
+    font-size: 14px;
+    color: #4A90E2;
+    margin-bottom: 6px;
+}
+
+.care-time {
+    font-size: 14px;
+    color: #2C3E50;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.assigned-badge {
+    display: inline-block;
+    background: #4A90E2;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+/* ⭐ UNIFIED BOTTOM NAV — MATCHES DASHBOARD + TEAM PROFILE */
+.bottom-nav {
+    background: #4A90E2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    height: 50px; /* identical across all screens */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    font-size: 22px;
+    padding: 0;
+    color: white;
+
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.15);
+}
+
+.nav-item {
+    text-align: center;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 60px;
+    position: relative; /* anchors dot */
+}
+  
+</style>
+  
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header-bar">
+    <img id="photo" class="pet-photo">
+
+    <div class="header-info">
+        <div id="name" class="pet-name"></div>
+        <div id="species" class="pet-species"></div>
+    </div>
+
+    <div id="editIcon" class="edit-icon">⋮</div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+
+    <button class="log-btn" onclick="openPetLog()">📘 Pet Log</button>
+
+    <div class="section">
+        <h2>Care Plan</h2>
+        <div id="careList"></div>
+    </div>
+
+</div>
+
+<!-- NAV -->
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='Dashboard.html'">🏠</div>
+    <div class="nav-item" id="teamIcon" onclick="location.href='TeamProfile.html'">👥</div>
+    <div class="nav-item" onclick="openPrimaryUser()">🧑</div>
+    
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const petId = Number(params.get("id"));
+
+const pets = JSON.parse(localStorage.getItem("pets") || "[]");
+const care = JSON.parse(localStorage.getItem("care") || "[]");
+const users = JSON.parse(localStorage.getItem("users") || "[]");
+const assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+
+const pet = pets.find(p => Number(p.id) === petId);
+
+if (!pet) {
+    alert("Pet not found.");
+    window.location.href = "Dashboard.html";
+} else {
+    document.getElementById("photo").src = pet.photo;
+    document.getElementById("name").textContent = pet.name;
+    document.getElementById("species").textContent = pet.type || "Pet";
+}
+
+document.getElementById("editIcon").onclick = () => {
+    window.location.href = `ManagePet.html?id=${pet.id}`;
+};
+
+function renderCare() {
+    const list = document.getElementById("careList");
+    list.innerHTML = "";
+
+    const petCare = care.filter(c => Number(c.petId) === Number(pet.id));
+
+    petCare.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "care-item";
+
+        const assignment = assigned.find(a => a.careId === item.id);
+
+        let assignedText = "";
+        if (assignment) {
+            const assignedUser = users.find(u => u.id === assignment.userId);
+            if (assignedUser) {
+                assignedText = `<div class="assigned-badge">Assigned to ${assignedUser.name}</div>`;
+            }
+        }
+
+        let timesHTML = "";
+        item.schedule.forEach(t => {
+            timesHTML += `<div class="care-time">⏰ ${t}</div>`;
+        });
+
+        div.innerHTML = `
+            <div class="care-title">${item.name}</div>
+            <div class="care-meta">${item.times}× • Daily</div>
+            ${timesHTML}
+            ${assignedText}
+        `;
+
+        list.appendChild(div);
+    });
+}
+
+renderCare();
+
+function openPrimaryUser() {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.length === 0) return;
+    const primary = users[0];
+    window.location.href = `UserProfile.html?id=${primary.id}`;
+}
+
+function openPetLog() {
+    window.location.href = `PetLog.html?id=${pet.id}`;
+}
+
+
+</script>
+
+</body>
+</html>
