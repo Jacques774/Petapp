@@ -5,222 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unified Pet Dashboard</title>
 
-<!-- ⭐ Socket.io Client Library -->
+<!-- External Stylesheet -->
+<link rel="stylesheet" href="style.css">
+
+<!-- Socket.io Client Library -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
-<style>
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #EAF3FF;
-    font-size: 16px; /* ⭐ Increased base size for better readability on mobile */
-}
-
-/* HEADER */
-.welcome-bar,
-.bottom-nav {
-    background: #4A90E2;
-    color: white;
-    font-weight: bold;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* ⭐ Dashboard header (warm message) */
-.welcome-bar {
-    text-align: center;
-    cursor: pointer;
-
-    height: 60px;
-    line-height: 60px;
-
-    overflow: hidden;
-    white-space: nowrap;
-
-    font-size: 16px;
-}
-
-/* ⭐ Bottom bar — EXACT MATCH to User Profile */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-
-    font-size: 22px;
-    padding: 0;
-    color: white;
-}
-
-/* ⭐ Nav item — same structure as User Profile */
-.nav-item {
-    text-align: center;
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 100%;
-    width: 60px;
-    position: relative;
-}
-
-/* ⭐ Notification dot */
-.notify-dot {
-    width: 12px;
-    height: 12px;
-    background: red;
-    border-radius: 50%;
-    border: 2px solid white;
-    position: absolute;
-
-    top: 7px;
-    right: 7px;
-
-    z-index: 10;
-}
-
-/* DASHBOARD CONTENT */
-.dashboard {
-    width: 100%;
-    padding: 0 12px; /* ⭐ Added side padding so it stretches nicely */
-    box-sizing: border-box;
-    height: calc(100vh - 110px);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-/* PET GRID */
-.pet-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-}
-
-/* PET CARD */
-.pet-card {
-    background: #FFFFFF;
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-}
-
-/* LEFT SIDE */
-.pet-left {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 110px;
-}
-
-.pet-photo {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #4A90E2;
-    cursor: pointer;
-}
-
-.pet-name {
-    margin-top: 8px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #2C3E50;
-    text-align: center;
-}
-
-/* RIGHT SIDE */
-.pet-right {
-    flex: 1;
-}
-
-.task-header {
-    font-size: 18px;
-    font-weight: bold;
-    color: #2C3E50;
-    margin-bottom: 10px;
-}
-
-.pet-task-item {
-    font-size: 15px;
-    color: #1A4C7C;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.task-amount {
-    color: #4A90E2;
-    font-weight: bold;
-}
-
-/* ⭐ Popup shared styles */
-.popup-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.45);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.popup-box {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    width: 80%;
-    max-width: 300px;
-    text-align: center;
-    font-family: Arial;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-}
-
-.popup-btn {
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 15px;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-/* ⭐ Reset Day standout animation */
-.reset-alert {
-    animation: resetPulse 1.6s infinite, resetBounce 2.4s infinite;
-}
-
-@keyframes resetPulse {
-    0% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.0); }
-    50% { box-shadow: 0 0 14px rgba(255, 255, 255, 0.95); }
-    100% { box-shadow: 0 0 0px rgba(255, 255, 255, 0.0); }
-}
-
-@keyframes resetBounce {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.12); }
-    100% { transform: scale(1); }
-}
-  
-</style>
 </head>
 
 <body>
@@ -232,7 +21,6 @@
 </div>
 
 <div class="bottom-nav">
-
     <div class="nav-item" onclick="location.href='Dashboard.html'">
         <span>🏠</span>
     </div>
@@ -249,47 +37,34 @@
     <div class="nav-item" onclick="checkIfAllTasksDone()" id="resetNavItem">
         <span>🔄</span>
     </div>
-
 </div>
 
-<!-- ⭐ Normal Reset Popup -->
+<!-- Normal Reset Popup -->
 <div id="resetPopup" class="popup-overlay">
     <div class="popup-box">
         <div style="font-size:18px;font-weight:bold;margin-bottom:10px;">Reset Today?</div>
         <div style="font-size:14px;color:#444;margin-bottom:20px;">
             This will clear all ✔️ ticks for today.<br>Logs will stay safe.
         </div>
-
-        <button class="popup-btn" style="background:#4A90E2;color:white;" onclick="confirmResetDay()">
-            Yes, Reset
-        </button>
-
-        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeResetPopup()">
-            Cancel
-        </button>
+        <button class="popup-btn" style="background:#4A90E2;color:white;" onclick="confirmResetDay()">Yes, Reset</button>
+        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeResetPopup()">Cancel</button>
     </div>
 </div>
 
-<!-- ⭐ Warning Popup -->
+<!-- Warning Popup -->
 <div id="warningPopup" class="popup-overlay">
     <div class="popup-box">
         <div style="font-size:18px;font-weight:bold;margin-bottom:10px;">Tasks Not Completed</div>
         <div style="font-size:14px;color:#444;margin-bottom:20px;">
             Some tasks are still unfinished.<br>Reset anyway?
         </div>
-
-        <button class="popup-btn" style="background:#E74C3C;color:white;" onclick="confirmResetDay()">
-            Yes, Reset Anyway
-        </button>
-
-        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeWarningPopup()">
-            Cancel
-        </button>
+        <button class="popup-btn" style="background:#E74C3C;color:white;" onclick="confirmResetDay()">Yes, Reset Anyway</button>
+        <button class="popup-btn" style="background:#ccc;color:#333;" onclick="closeWarningPopup()">Cancel</button>
     </div>
 </div>
 
 <script>
-/* ⭐ Connect to your live Render backend via Socket.io */
+// Connect to your Render backend via Socket.io for live multi-device syncing
 const socket = io(); 
 
 let pets = [];
@@ -297,15 +72,9 @@ let care = [];
 let assigned = [];
 let petLogs = [];
 
-socket.on('initial-tasks', (serverTasks) => {
-    renderDashboard();
-});
+socket.on('initial-tasks', () => { renderDashboard(); });
+socket.on('task-updated', () => { renderDashboard(); });
 
-socket.on('task-updated', (serverTasks) => {
-    renderDashboard();
-});
-
-/* ⭐ Reset Notification: Glow + Pulse + Bounce */
 function notifyResetNeeded() {
     const today = new Date().toDateString();
     const lastReset = localStorage.getItem("lastReset");
@@ -318,10 +87,8 @@ function notifyResetNeeded() {
     }
 }
 
-/* ⭐ Warm Message System */
 function setWarmMessage() {
     const header = document.getElementById("welcomeBar");
-
     const messages = [
         "🐾 Your pets are lucky to have you.",
         "💙 Today feels like a good day.",
@@ -334,7 +101,6 @@ function setWarmMessage() {
         "🌞 You bring good energy to your pets.",
         "🐾 Everything feels in harmony today."
     ];
-
     header.innerHTML = messages[Math.floor(Math.random() * messages.length)];
 }
 
@@ -349,7 +115,6 @@ function scheduleRandomMessageChange() {
     }, randomInterval());
 }
 
-/* ⭐ Unified Notification Logic */
 function updateTeamIconNotification() {
     const teamIcon = document.getElementById("teamIcon");
     if (!teamIcon) return;
@@ -402,7 +167,6 @@ function getCompletedCountToday(petId, careId) {
     ).length;
 }
 
-/* ⭐ Render Dashboard UI */
 function renderDashboard() {
     pets = JSON.parse(localStorage.getItem("pets") || "[]");
     care = JSON.parse(localStorage.getItem("care") || "[]");
@@ -462,7 +226,6 @@ function renderDashboard() {
     updateTeamIconNotification();
 }
 
-/* ⭐ Dashboard Logic */
 document.addEventListener("DOMContentLoaded", () => {
     notifyResetNeeded();
     setInterval(notifyResetNeeded, 60000);
@@ -474,14 +237,12 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDashboard();
 });
 
-/* ⭐ Primary User Navigation */
 function openPrimaryUser() {
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     if (users.length === 0) return;
     window.location.href = `UserProfile.html?id=${users[0].id}`;
 }
 
-/* ⭐ Reset Popup Logic */
 function openResetPopup() {
     document.getElementById("resetPopup").style.display = "flex";
 }
