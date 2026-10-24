@@ -16,6 +16,7 @@
     padding: 0;
     font-family: Arial, sans-serif;
     background: #EAF3FF;
+    font-size: 16px; /* ⭐ Increased base size for better readability on mobile */
 }
 
 /* HEADER */
@@ -90,8 +91,9 @@
 
 /* DASHBOARD CONTENT */
 .dashboard {
-    width: 92%;
-    margin: auto;
+    width: 100%;
+    padding: 0 12px; /* ⭐ Added side padding so it stretches nicely */
+    box-sizing: border-box;
     height: calc(100vh - 110px);
     overflow-y: auto;
     display: flex;
@@ -101,8 +103,8 @@
 /* PET GRID */
 .pet-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
     margin-top: 15px;
 }
 
@@ -288,7 +290,7 @@
 
 <script>
 /* ⭐ Connect to your live Render backend via Socket.io */
-const socket = io(); // Automatically connects to the current host URL on Render
+const socket = io(); 
 
 let pets = [];
 let care = [];
