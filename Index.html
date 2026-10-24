@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unified Pet Dashboard</title>
 
+<!-- ⭐ Socket.io Client Library -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <style>
   html, body {
     height: 100%;
@@ -242,8 +245,8 @@
     </div>
 
     <div class="nav-item" onclick="checkIfAllTasksDone()" id="resetNavItem">
-    <span>🔄</span>
-</div>
+        <span>🔄</span>
+    </div>
 
 </div>
 
@@ -284,11 +287,26 @@
 </div>
 
 <script>
+/* ⭐ Connect to your live Render backend via Socket.io */
+const socket = io(); // Automatically connects to the current host URL on Render
+
+let pets = [];
+let care = [];
+let assigned = [];
+let petLogs = [];
+
+socket.on('initial-tasks', (serverTasks) => {
+    renderDashboard();
+});
+
+socket.on('task-updated', (serverTasks) => {
+    renderDashboard();
+});
+
 /* ⭐ Reset Notification: Glow + Pulse + Bounce */
 function notifyResetNeeded() {
     const today = new Date().toDateString();
     const lastReset = localStorage.getItem("lastReset");
-
     const resetBtn = document.getElementById("resetNavItem");
 
     if (lastReset !== today) {
@@ -297,9 +315,6 @@ function notifyResetNeeded() {
         resetBtn.classList.remove("reset-alert");
     }
 }
-
-
-// @ts-nocheck
 
 /* ⭐ Warm Message System */
 function setWarmMessage() {
@@ -318,8 +333,7 @@ function setWarmMessage() {
         "🐾 Everything feels in harmony today."
     ];
 
-    const pick = messages[Math.floor(Math.random() * messages.length)];
-    header.innerHTML = pick;
+    header.innerHTML = messages[Math.floor(Math.random() * messages.length)];
 }
 
 function randomInterval() {
@@ -337,9 +351,6 @@ function scheduleRandomMessageChange() {
 function updateTeamIconNotification() {
     const teamIcon = document.getElementById("teamIcon");
     if (!teamIcon) return;
-
-    let care = JSON.parse(localStorage.getItem("care") || "[]");
-    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
 
     const anyUnassigned = care.some(c =>
         !assigned.some(a => a.careId === c.id)
@@ -359,58 +370,48 @@ function updateTeamIconNotification() {
     }
 }
 
-/* ⭐ Dashboard Logic */
-document.addEventListener("DOMContentLoaded", () => {
-
-    notifyResetNeeded();
-    setInterval(notifyResetNeeded, 60000);
-
-    setWarmMessage();
-    scheduleRandomMessageChange();
-    document.getElementById("welcomeBar").onclick = () => setWarmMessage();
-
-    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
-    let care = JSON.parse(localStorage.getItem("care") || "[]");
-    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
-    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
-
-    function extractPetId(item) {
-        for (const key in item) {
-            if (key.toLowerCase().includes("pet")) return item[key];
-        }
-        return null;
+function extractPetId(item) {
+    for (const key in item) {
+        if (key.toLowerCase().includes("pet")) return item[key];
     }
+    return null;
+}
 
-    function getTaskIcon(name) {
-        name = name.toLowerCase();
-        if (name.includes("feed")) return "🍽";
-        if (name.includes("water")) return "💧";
-        if (name.includes("walk")) return "🚶";
-        if (name.includes("med")) return "💊";
-        if (name.includes("clean")) return "🧼";
-        if (name.includes("groom")) return "✂️";
-        return "🐾";
-    }
+function getTaskIcon(name) {
+    name = name.toLowerCase();
+    if (name.includes("feed")) return "🍽";
+    if (name.includes("water")) return "💧";
+    if (name.includes("walk")) return "🚶";
+    if (name.includes("med")) return "💊";
+    if (name.includes("clean")) return "🧼";
+    if (name.includes("groom")) return "✂️";
+    return "🐾";
+}
 
-    function todayKey() {
-        return new Date().toISOString().split("T")[0];
-    }
+function todayKey() {
+    return new Date().toISOString().split("T")[0];
+}
 
-    function getCompletedCountToday(petId, careId) {
-        return petLogs.filter(log =>
-            log.petId === petId &&
-            log.careId === careId &&
-            log.date === todayKey()
-        ).length;
-    }
+function getCompletedCountToday(petId, careId) {
+    return petLogs.filter(log =>
+        log.petId === petId &&
+        log.careId === careId &&
+        log.date === todayKey()
+    ).length;
+}
+
+/* ⭐ Render Dashboard UI */
+function renderDashboard() {
+    pets = JSON.parse(localStorage.getItem("pets") || "[]");
+    care = JSON.parse(localStorage.getItem("care") || "[]");
+    assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+    petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
 
     const petGrid = document.getElementById("petGrid");
     petGrid.innerHTML = "";
 
     pets.forEach(pet => {
-
         const petTasks = care.filter(c => Number(extractPetId(c)) === Number(pet.id));
-
         const hasUnassignedCare = petTasks.some(t =>
             !assigned.some(a => a.careId === t.id)
         );
@@ -457,6 +458,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     updateTeamIconNotification();
+}
+
+/* ⭐ Dashboard Logic */
+document.addEventListener("DOMContentLoaded", () => {
+    notifyResetNeeded();
+    setInterval(notifyResetNeeded, 60000);
+
+    setWarmMessage();
+    scheduleRandomMessageChange();
+    document.getElementById("welcomeBar").onclick = () => setWarmMessage();
+
+    renderDashboard();
 });
 
 /* ⭐ Primary User Navigation */
@@ -470,45 +483,25 @@ function openPrimaryUser() {
 function openResetPopup() {
     document.getElementById("resetPopup").style.display = "flex";
 }
-
 function closeResetPopup() {
     document.getElementById("resetPopup").style.display = "none";
 }
-
 function openWarningPopup() {
     document.getElementById("warningPopup").style.display = "flex";
 }
-
 function closeWarningPopup() {
     document.getElementById("warningPopup").style.display = "none";
 }
 
-/* ⭐ Smart Reset: Check if all tasks done */
 function checkIfAllTasksDone() {
-    let pets = JSON.parse(localStorage.getItem("pets") || "[]");
-    let care = JSON.parse(localStorage.getItem("care") || "[]");
-    let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
-    let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
-
-    function todayKey() {
-        return new Date().toISOString().split("T")[0];
-    }
-
     let totalTasks = 0;
     let completedTasks = 0;
 
     pets.forEach(pet => {
         const petTasks = care.filter(c => Number(c.petId) === Number(pet.id));
-
         petTasks.forEach(t => {
             totalTasks += t.times;
-
-            const done = petLogs.filter(log =>
-                log.petId === pet.id &&
-                log.careId === t.id &&
-                log.date === todayKey()
-            ).length;
-
+            const done = getCompletedCountToday(pet.id, t.id);
             completedTasks += done;
         });
     });
@@ -520,54 +513,30 @@ function checkIfAllTasksDone() {
     }
 }
 
-/* ⭐ Confirm Reset — FINAL FIX */
 function confirmResetDay() {
-
     let petLogs = JSON.parse(localStorage.getItem("petLogs") || "[]");
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // ⭐ Yesterday date (so Today filter is empty)
+    const today = todayKey();
     let yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yDate = yesterday.toISOString().split("T")[0];
 
-    // ⭐ 1. Move ALL today's logs to yesterday (keep user + task EXACTLY)
     petLogs = petLogs.map(log => {
         if (log.date === today) {
-            return {
-                ...log,
-                date: yDate
-            };
+            return { ...log, date: yDate };
         }
         return log;
     });
 
     localStorage.setItem("petLogs", JSON.stringify(petLogs));
-
-    // ⭐ 2. Remove UI ticks (Dashboard)
-    document.querySelectorAll(".pet-task-item span").forEach(tick => {
-        if (tick.textContent === "✔️") tick.remove();
-    });
-
-    // ⭐ 3. Change User Profile buttons to blue
     localStorage.setItem("userProfileButtons", "blue");
-
-    // ⭐ 4. Mark today as reset
     localStorage.setItem("lastReset", new Date().toDateString());
 
-    // ⭐ 5. Close popups
     closeResetPopup();
     closeWarningPopup();
-
-    // ⭐ 6. Remove glow
     document.getElementById("resetNavItem").classList.remove("reset-alert");
-
-    // ⭐ 7. Reload AFTER everything is saved
     location.reload();
 }
 </script>
-  
 
 </body>
 </html>
